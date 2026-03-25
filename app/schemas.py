@@ -10,12 +10,6 @@ from pydantic import BaseModel, Field, model_validator
 class State(str, Enum):
     BERLIN = "Berlin"
     NRW = "NRW"
-    BAYERN = "Bayern"
-    HAMBURG = "Hamburg"
-    BADEN_WUERTTEMBERG = "Baden-Württemberg"
-    HESSEN = "Hessen"
-    NIEDERSACHSEN = "Niedersachsen"
-    SACHSEN = "Sachsen"
 
 
 class LegalForm(str, Enum):
@@ -34,6 +28,7 @@ class CaseProfile(BaseModel):
     takeaway_only: bool = False
     existing_gastro_premises: bool = False
     employees_handle_food: bool = True
+    founder_handles_food: bool = True
     legal_form: LegalForm = LegalForm.SOLE_PROPRIETOR
 
     @model_validator(mode="after")
@@ -87,6 +82,8 @@ class CaseFlags(BaseModel):
     needs_food_registration: bool = True
     needs_ifsg: bool = False
     needs_restaurant_permit: bool = False
+    needs_ihk_instruction: bool = False
+    needs_commercial_register: bool = False
     needs_location_followup: bool = False
 
 

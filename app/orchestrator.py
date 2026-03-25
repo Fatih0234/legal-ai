@@ -52,17 +52,9 @@ def gather_procedures(
             procedures.append(
                 berlin_service.get_restaurant_permit(state_val, case.city, True)
             )
-            procedures.append(
-                berlin_service.get_ihk_instruction(state_val, case.city, True)
-            )
-        elif state_val == "NRW":
+        else:  # NRW
             procedures.append(
                 nrw_service.get_restaurant_permit(state_val, case.city, True)
-            )
-        else:
-            from app.adapters import generic_service
-            procedures.append(
-                generic_service.get_restaurant_permit(state_val, case.city, True)
             )
     else:
         # Still document the non-requirement
@@ -70,15 +62,16 @@ def gather_procedures(
             procedures.append(
                 berlin_service.get_restaurant_permit(state_val, case.city, False)
             )
-        elif state_val == "NRW":
+        else:  # NRW
             procedures.append(
                 nrw_service.get_restaurant_permit(state_val, case.city, False)
             )
-        else:
-            from app.adapters import generic_service
-            procedures.append(
-                generic_service.get_restaurant_permit(state_val, case.city, False)
-            )
+
+    # Conditional: IHK Unterrichtung (decoupled from restaurant permit flag)
+    if flags.needs_ihk_instruction and state_val == "Berlin":
+        procedures.append(
+            berlin_service.get_ihk_instruction(state_val, case.city, True)
+        )
 
     # Always: tax registration
     action_steps.append(elster.get_tax_registration_step(case.legal_form))
@@ -135,13 +128,19 @@ def build_checklist(
                     links.append(proc.source_url)
                 authorities.append("Ordnungsamt (Public Order Office)")
         elif proc.category == "instruction":
-            if flags.needs_restaurant_permit and proc.steps:
+            if flags.needs_ihk_instruction and proc.steps:
                 conditional.append(
                     "Complete IHK Unterrichtung (gastronomy instruction)"
                 )
                 if proc.source_url:
                     links.append(proc.source_url)
                 authorities.append("IHK")
+
+    if flags.needs_commercial_register:
+        must_do.append(
+            "Register with Handelsregister (commercial register) before Gewerbeanmeldung"
+        )
+        authorities.append("Amtsgericht (Local Court)")
 
     for step in action_steps:
         if step.action_type == "registration":
@@ -197,8 +196,7 @@ async def evaluate_case(case: CaseProfile) -> CaseResult:
 async def gather_procedures_live(
     case: CaseProfile,
 ) -> tuple[list[Procedure], list[ActionStep], list[RiskFlag]]:
-    """Live mode: fetch SDG procedures for all non-Berlin states; Berlin stays static."""
-    from app.adapters import generic_service
+    """Live mode: fetch SDG procedures for NRW; Berlin stays static."""
     from app.adapters.sdg_client import SDGClient
 
     flags = derive_flags(case)
@@ -247,30 +245,25 @@ async def gather_procedures_live(
             procedures.append(
                 berlin_service.get_restaurant_permit(state_val, case.city, True)
             )
-            procedures.append(
-                berlin_service.get_ihk_instruction(state_val, case.city, True)
-            )
-        elif state_val == "NRW":
+        else:  # NRW
             procedures.append(
                 nrw_service.get_restaurant_permit(state_val, case.city, True)
-            )
-        else:
-            procedures.append(
-                generic_service.get_restaurant_permit(state_val, case.city, True)
             )
     else:
         if state_val == "Berlin":
             procedures.append(
                 berlin_service.get_restaurant_permit(state_val, case.city, False)
             )
-        elif state_val == "NRW":
+        else:  # NRW
             procedures.append(
                 nrw_service.get_restaurant_permit(state_val, case.city, False)
             )
-        else:
-            procedures.append(
-                generic_service.get_restaurant_permit(state_val, case.city, False)
-            )
+
+    # Conditional: IHK Unterrichtung (decoupled from restaurant permit flag)
+    if flags.needs_ihk_instruction and state_val == "Berlin":
+        procedures.append(
+            berlin_service.get_ihk_instruction(state_val, case.city, True)
+        )
 
     # Tax + DGUV (always static)
     action_steps.append(elster.get_tax_registration_step(case.legal_form))

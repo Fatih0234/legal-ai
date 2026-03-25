@@ -4,12 +4,6 @@ from __future__ import annotations
 STATE_CODES: dict[str, str] = {
     "Berlin": "BE",
     "NRW": "NW",
-    "Bayern": "BY",
-    "Hamburg": "HH",
-    "Baden-Württemberg": "BW",
-    "Hessen": "HE",
-    "Niedersachsen": "NI",
-    "Sachsen": "SN",
 }
 
 # City → SDG region code per state.
@@ -29,23 +23,6 @@ REGION_CODES: dict[str, dict[str, str]] = {
         "Bochum": "055000000000",
         "Essen": "051000000000",
     },
-    "Bayern": {
-        "München": "091000000000",
-        "Nürnberg": "095000000000",
-        "Augsburg": "097000000000",
-        "Würzburg": "096000000000",
-        "Regensburg": "093000000000",
-        "Ingolstadt": "091000000000",
-    },
-    # City-states: single entry, city = state name
-    "Hamburg": {
-        "Hamburg": "020000000000",
-    },
-    # BW, Hessen, Niedersachsen, Sachsen: rely on name-based fallback in SDG client
-    "Baden-Württemberg": {},
-    "Hessen": {},
-    "Niedersachsen": {},
-    "Sachsen": {},
 }
 
 # Backward-compatibility alias used by legacy imports

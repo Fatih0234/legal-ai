@@ -29,3 +29,8 @@ asyncio_mode = "auto"
 markers = [
     "live: tests that make real HTTP calls to SDG portal",
 ]
+
+[tool.uv.workspace]
+members = [
+    "recruiting_mock_data",
+]

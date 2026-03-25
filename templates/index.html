@@ -554,12 +554,6 @@ button[type="submit"]:disabled { background: var(--text-muted); cursor: wait; }
               <select id="state" name="state">
                 <option value="Berlin">Berlin</option>
                 <option value="NRW">NRW</option>
-                <option value="Bayern">Bayern</option>
-                <option value="Hamburg">Hamburg</option>
-                <option value="Baden-Württemberg">Baden-Württemberg</option>
-                <option value="Hessen">Hessen</option>
-                <option value="Niedersachsen">Niedersachsen</option>
-                <option value="Sachsen">Sachsen</option>
               </select>
             </div>
           </div>
@@ -610,6 +604,16 @@ button[type="submit"]:disabled { background: var(--text-muted); cursor: wait; }
           <label class="cb">
             <input type="checkbox" id="employees_handle_food" name="employees_handle_food" checked>
             <span>Mitarbeiter mit Lebensmittelkontakt (staff handle food)</span>
+          </label>
+        </div>
+      </div>
+
+      <div class="form-section">
+        <p class="form-section-title">04 — Datenabruf</p>
+        <div class="cb-group">
+          <label class="cb">
+            <input type="checkbox" id="live" name="live">
+            <span>Live-Abfrage offizieller Quellen — Use live official-source lookup (slower, more accurate outside Berlin/NRW)</span>
           </label>
         </div>
       </div>
@@ -721,9 +725,7 @@ button[type="submit"]:disabled { background: var(--text-muted); cursor: wait; }
 
 <script>
 const STATE_CITIES = {
-  'Berlin': 'Berlin', 'NRW': 'Köln', 'Bayern': 'München',
-  'Hamburg': 'Hamburg', 'Baden-Württemberg': 'Stuttgart',
-  'Hessen': 'Frankfurt', 'Niedersachsen': 'Hannover', 'Sachsen': 'Dresden',
+  'Berlin': 'Berlin', 'NRW': 'Köln',
 };
 
 document.getElementById('state').addEventListener('change', function() {
@@ -756,6 +758,7 @@ document.getElementById('case-form').addEventListener('submit', async function(e
     existing_gastro_premises:document.getElementById('existing_gastro_premises').checked,
     employees_handle_food:   document.getElementById('employees_handle_food').checked,
     legal_form:              document.getElementById('legal_form').value,
+    live:                    document.getElementById('live').checked,
   };
 
   try {
@@ -981,7 +984,7 @@ async function sendChat() {
     const resp = await fetch('/api/chat', {
       method: 'POST',
       headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({message: msg, session_id: currentSessionId || ''}),
+      body: JSON.stringify({message: msg, session_id: currentSessionId || '', case_id: currentCaseId || ''}),
     });
     const data = await resp.json();
     loading.remove();

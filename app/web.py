@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import logging
 import uuid
 from pathlib import Path
 
@@ -13,6 +14,8 @@ from app.schemas import CaseProfile, CaseResult
 from app.store import cases as cases_store
 from app.store import progress as progress_store
 from app.store import sessions as sessions_store
+
+logger = logging.getLogger(__name__)
 
 app = FastAPI(title="Germany Café Navigator")
 
@@ -98,9 +101,27 @@ async def update_step(case_id: str, step_key: str, req: StepStatusRequest):
     return {"ok": True}
 
 
+def _chat_fallback(case_id: str) -> str:
+    if case_id:
+        result = cases_store.get(case_id)
+        if result and result.must_do_now:
+            steps = "\n".join(f"• {s}" for s in result.must_do_now)
+            return (
+                "I'm temporarily unavailable. "
+                "Based on your evaluation, your key action items are:\n\n"
+                f"{steps}\n\n"
+                "Please refer to the full checklist above for details."
+            )
+    return (
+        "I'm temporarily unavailable. "
+        "Please refer to your checklist above or try again later."
+    )
+
+
 class ChatRequest(BaseModel):
     message: str
     session_id: str = ""
+    case_id: str = ""
 
 
 @app.post("/api/chat")
@@ -128,8 +149,10 @@ async def chat(req: ChatRequest):
         # Persist updated history
         sessions_store.save(session_id, ModelMessagesTypeAdapter.dump_json(result.all_messages()))
         return {"response": result.output, "session_id": session_id}
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+    except Exception as exc:
+        logger.error("Chat agent failed: %s", exc)
+        fallback = _chat_fallback(req.case_id)
+        return {"response": fallback, "session_id": session_id}
 
 
 @app.delete("/api/chat/{session_id}")
