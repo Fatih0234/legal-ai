@@ -18,6 +18,13 @@ class LegalForm(str, Enum):
     GMBH = "GmbH"
 
 
+class PremisesType(str, Enum):
+    NEW_NON_GASTRO = "new_non_gastro"
+    EXISTING_GASTRONOMY = "existing_gastronomy"
+    CHANGE_OF_USE = "change_of_use"
+    TAKEOVER = "takeover"
+
+
 class CaseProfile(BaseModel):
     state: State
     city: str
@@ -26,9 +33,11 @@ class CaseProfile(BaseModel):
     serves_alcohol: bool = False
     has_seating: bool = True
     takeaway_only: bool = False
-    existing_gastro_premises: bool = False
+    premises_type: PremisesType = PremisesType.NEW_NON_GASTRO
+    has_public_terrace: bool = False
     employees_handle_food: bool = True
     founder_handles_food: bool = True
+    has_employees: bool = False
     legal_form: LegalForm = LegalForm.SOLE_PROPRIETOR
 
     @model_validator(mode="after")
@@ -85,6 +94,10 @@ class CaseFlags(BaseModel):
     needs_ihk_instruction: bool = False
     needs_commercial_register: bool = False
     needs_location_followup: bool = False
+    needs_change_of_use_permit: bool = False
+    needs_public_terrace_permit: bool = False
+    needs_takeover_verification: bool = False
+    needs_social_insurance: bool = False
 
 
 class CaseResult(BaseModel):

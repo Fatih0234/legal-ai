@@ -5,6 +5,8 @@ from app.adapters import (
     elster,
     dguv,
     geoportal,
+    handelsregister,
+    sozialversicherung,
 )
 from app.schemas import ActionStep, Procedure, RiskFlag
 
@@ -97,11 +99,36 @@ def test_elster_gmbh():
     assert isinstance(step, ActionStep)
 
 
+def test_handelsregister_ug():
+    step = handelsregister.get_handelsregister_step("UG")
+    assert isinstance(step, ActionStep)
+    assert "UG" in step.title
+    assert step.source_url.startswith("https://")
+    assert step.action_url.startswith("https://")
+    assert "€1" in step.description
+
+
+def test_handelsregister_gmbh():
+    step = handelsregister.get_handelsregister_step("GmbH")
+    assert isinstance(step, ActionStep)
+    assert "GmbH" in step.title
+    assert step.source_url.startswith("https://")
+    assert "25.000" in step.description
+
+
 def test_dguv_registration():
     step = dguv.get_dguv_registration_step()
     assert isinstance(step, ActionStep)
     assert step.action_type == "insurance"
     assert step.source_url
+
+
+def test_sozialversicherung_registration():
+    step = sozialversicherung.get_social_insurance_registration_step()
+    assert isinstance(step, ActionStep)
+    assert step.action_type == "registration"
+    assert step.source_url
+    assert "Sozialversicherung" in step.title or "Mitarbeiter" in step.title
 
 
 def test_geoportal_sources():
@@ -120,14 +147,41 @@ def test_geoportal_nrw():
 
 
 def test_geoportal_location_risk_existing():
-    risks = geoportal.flag_location_risk(existing_gastro_premises=True)
+    from app.schemas import PremisesType
+    risks = geoportal.flag_location_risk(PremisesType.EXISTING_GASTRONOMY)
     assert isinstance(risks, list)
     assert len(risks) == 1
     assert risks[0].severity == "info"
 
 
 def test_geoportal_location_risk_new():
-    risks = geoportal.flag_location_risk(existing_gastro_premises=False)
+    from app.schemas import PremisesType
+    risks = geoportal.flag_location_risk(PremisesType.NEW_NON_GASTRO)
     assert isinstance(risks, list)
     assert len(risks) == 2
     assert any(r.severity == "warning" for r in risks)
+
+
+def test_geoportal_location_risk_change_of_use():
+    from app.schemas import PremisesType
+    risks = geoportal.flag_location_risk(PremisesType.CHANGE_OF_USE)
+    assert isinstance(risks, list)
+    assert len(risks) == 2
+    assert any(r.category == "Nutzungsänderung" for r in risks)
+    assert any(r.severity == "warning" for r in risks)
+
+
+def test_geoportal_location_risk_takeover():
+    from app.schemas import PremisesType
+    risks = geoportal.flag_location_risk(PremisesType.TAKEOVER)
+    assert isinstance(risks, list)
+    assert len(risks) == 1
+    assert risks[0].category == "Übernahme Gaststätte"
+    assert risks[0].severity == "warning"
+
+
+def test_geoportal_location_risk_public_terrace():
+    from app.schemas import PremisesType
+    risks = geoportal.flag_location_risk(PremisesType.EXISTING_GASTRONOMY, has_public_terrace=True)
+    assert len(risks) == 2
+    assert any(r.category == "Außenbereich / Terrasse" for r in risks)

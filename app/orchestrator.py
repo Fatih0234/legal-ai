@@ -12,10 +12,12 @@ from app.adapters import (
     elster,
     dguv,
     geoportal,
+    handelsregister,
+    sozialversicherung,
 )
 from app.agent import AppDeps, legal_agent
 from app.pipelines.rules import derive_flags
-from app.schemas import ActionStep, CaseProfile, CaseResult, Procedure, RiskFlag
+from app.schemas import ActionStep, CaseProfile, CaseResult, LegalForm, Procedure, RiskFlag
 
 logger = logging.getLogger(__name__)
 
@@ -73,17 +75,24 @@ def gather_procedures(
             berlin_service.get_ihk_instruction(state_val, case.city, True)
         )
 
+    # Conditional: Handelsregister (before Gewerbeanmeldung)
+    if flags.needs_commercial_register:
+        action_steps.append(handelsregister.get_handelsregister_step(case.legal_form))
+
     # Always: tax registration
     action_steps.append(elster.get_tax_registration_step(case.legal_form))
 
     # Always: DGUV (when employees exist, implicit for food businesses)
     action_steps.append(dguv.get_dguv_registration_step())
 
-    # Conditional: location risk
-    if flags.needs_location_followup:
-        risk_flags.extend(geoportal.flag_location_risk(existing_gastro_premises=False))
-    else:
-        risk_flags.extend(geoportal.flag_location_risk(existing_gastro_premises=True))
+    # Conditional: social insurance registration (employer duty, distinct from food-law IfSG)
+    if flags.needs_social_insurance:
+        action_steps.append(sozialversicherung.get_social_insurance_registration_step())
+
+    # Location / premises risk
+    risk_flags.extend(
+        geoportal.flag_location_risk(case.premises_type, case.has_public_terrace)
+    )
 
     return procedures, action_steps, risk_flags
 
@@ -137,10 +146,46 @@ def build_checklist(
                 authorities.append("IHK")
 
     if flags.needs_commercial_register:
-        must_do.append(
-            "Register with Handelsregister (commercial register) before Gewerbeanmeldung"
+        legal_form = case.legal_form
+        entity = "GmbH" if legal_form == LegalForm.GMBH else "UG (haftungsbeschränkt)"
+        capital_note = (
+            "min. €25,000 (min. €12,500 at founding)" if legal_form == LegalForm.GMBH
+            else "min. €1 (paid in full at founding)"
         )
-        authorities.append("Amtsgericht (Local Court)")
+        must_do.append(
+            f"Draft and notarize articles of association (Gesellschaftsvertrag) for {entity}"
+        )
+        must_do.append(
+            f"Open business bank account and deposit Stammkapital ({capital_note})"
+        )
+        documents.append("Gesellschaftsvertrag / Satzung (notarielle Beurkundung)")
+        documents.append("Gesellschafterliste")
+        documents.append("Nachweis Stammkapitaleinlage (bank confirmation)")
+        documents.append(
+            "Handelsregisterauszug (aktuell — required for Gewerbeanmeldung)"
+        )
+        authorities.append("Notar (Notary)")
+        authorities.append("Amtsgericht (Local Court — Handelsregister)")
+
+    if flags.needs_change_of_use_permit:
+        conditional.append(
+            "Apply for Baugenehmigung Nutzungsänderung (change-of-use building permit) "
+            "before signing lease"
+        )
+        authorities.append("Bauaufsichtsbehörde (Building Authority)")
+
+    if flags.needs_takeover_verification:
+        conditional.append(
+            "Apply for new Gaststättenerlaubnis — existing permit is personal and "
+            "non-transferable"
+        )
+        authorities.append("Ordnungsamt (Public Order Office)")
+
+    if flags.needs_public_terrace_permit:
+        conditional.append(
+            "Apply for Sondernutzungserlaubnis for outdoor seating on public land"
+        )
+        authorities.append("Straßen- und Grünflächenamt (Streets & Green Spaces Office)")
 
     for step in action_steps:
         if step.action_type == "registration":
@@ -269,11 +314,14 @@ async def gather_procedures_live(
     action_steps.append(elster.get_tax_registration_step(case.legal_form))
     action_steps.append(dguv.get_dguv_registration_step())
 
-    # Location risk
-    if flags.needs_location_followup:
-        risk_flags.extend(geoportal.flag_location_risk(existing_gastro_premises=False))
-    else:
-        risk_flags.extend(geoportal.flag_location_risk(existing_gastro_premises=True))
+    # Conditional: social insurance registration
+    if flags.needs_social_insurance:
+        action_steps.append(sozialversicherung.get_social_insurance_registration_step())
+
+    # Location / premises risk
+    risk_flags.extend(
+        geoportal.flag_location_risk(case.premises_type, case.has_public_terrace)
+    )
 
     return procedures, action_steps, risk_flags
 

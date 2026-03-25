@@ -10,6 +10,7 @@ from app.adapters import (
     elster,
     dguv,
     geoportal,
+    sozialversicherung,
 )
 from app.prompts import CHAT_SYSTEM_PROMPT
 
@@ -111,13 +112,24 @@ def get_dguv_registration() -> str:
 
 
 @chat_agent.tool_plain
-def get_location_risk(existing_gastro_premises: bool) -> str:
+def get_social_insurance_registration() -> str:
+    """Get the social insurance registration (Sozialversicherungsanmeldung) step.
+    Required when the employer hires staff (Angestellte or Minijobber).
+    This is an employer duty separate from the food-law IfSG instruction.
+    """
+    step = sozialversicherung.get_social_insurance_registration_step()
+    return step.model_dump_json(indent=2)
+
+
+@chat_agent.tool_plain
+def get_location_risk(premises_type: str, has_public_terrace: bool = False) -> str:
     """Get location/zoning risk flags for a premises.
 
     Args:
-        existing_gastro_premises: Whether the location was previously used as gastronomy
+        premises_type: One of "new_non_gastro", "existing_gastronomy", "change_of_use", "takeover"
+        has_public_terrace: Whether outdoor seating on public land is planned
     """
     import json
 
-    risks = geoportal.flag_location_risk(existing_gastro_premises)
+    risks = geoportal.flag_location_risk(premises_type, has_public_terrace)
     return json.dumps([r.model_dump() for r in risks], indent=2, ensure_ascii=False)

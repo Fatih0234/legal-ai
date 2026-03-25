@@ -6,7 +6,8 @@
   "serves_alcohol": false,
   "has_seating": true,
   "takeaway_only": false,
-  "existing_gastro_premises": false,
   "employees_handle_food": true,
-  "legal_form": "sole proprietor"
+  "legal_form": "sole proprietor",
+  "premises_type": "new_non_gastro",
+  "has_public_terrace": false
 }

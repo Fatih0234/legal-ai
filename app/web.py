@@ -35,7 +35,8 @@ class EvaluateRequest(BaseModel):
     serves_alcohol: bool = False
     has_seating: bool = True
     takeaway_only: bool = False
-    existing_gastro_premises: bool = False
+    premises_type: str = "new_non_gastro"
+    has_public_terrace: bool = False
     employees_handle_food: bool = True
     legal_form: str = "sole proprietor"
     live: bool = False

@@ -1,5 +1,5 @@
 from app.pipelines.rules import derive_flags
-from app.schemas import CaseProfile, LegalForm, State
+from app.schemas import CaseProfile, LegalForm, PremisesType, State
 
 
 def test_berlin_no_alcohol_flags():
@@ -9,7 +9,7 @@ def test_berlin_no_alcohol_flags():
         serves_alcohol=False,
         employees_handle_food=True,
         founder_handles_food=False,
-        existing_gastro_premises=False,
+        premises_type=PremisesType.NEW_NON_GASTRO,
     )
     flags = derive_flags(case)
     assert flags.needs_trade_registration is True
@@ -28,7 +28,7 @@ def test_berlin_alcohol_flags():
         has_seating=True,
         employees_handle_food=True,
         founder_handles_food=False,
-        existing_gastro_premises=False,
+        premises_type=PremisesType.NEW_NON_GASTRO,
         legal_form=LegalForm.UG,
     )
     flags = derive_flags(case)
@@ -47,7 +47,7 @@ def test_nrw_takeaway_no_employees():
         serves_alcohol=False,
         employees_handle_food=False,
         founder_handles_food=False,
-        existing_gastro_premises=True,
+        premises_type=PremisesType.EXISTING_GASTRONOMY,
     )
     flags = derive_flags(case)
     assert flags.needs_trade_registration is True
@@ -62,10 +62,56 @@ def test_existing_premises_no_location_risk():
     case = CaseProfile(
         state=State.BERLIN,
         city="Berlin",
-        existing_gastro_premises=True,
+        premises_type=PremisesType.EXISTING_GASTRONOMY,
     )
     flags = derive_flags(case)
     assert flags.needs_location_followup is False
+    assert flags.needs_change_of_use_permit is False
+    assert flags.needs_takeover_verification is False
+
+
+def test_change_of_use_flags():
+    case = CaseProfile(
+        state=State.BERLIN,
+        city="Berlin",
+        premises_type=PremisesType.CHANGE_OF_USE,
+    )
+    flags = derive_flags(case)
+    assert flags.needs_location_followup is True
+    assert flags.needs_change_of_use_permit is True
+    assert flags.needs_takeover_verification is False
+
+
+def test_takeover_flags():
+    case = CaseProfile(
+        state=State.BERLIN,
+        city="Berlin",
+        premises_type=PremisesType.TAKEOVER,
+    )
+    flags = derive_flags(case)
+    assert flags.needs_location_followup is True
+    assert flags.needs_takeover_verification is True
+    assert flags.needs_change_of_use_permit is False
+
+
+def test_public_terrace_flag():
+    case = CaseProfile(
+        state=State.BERLIN,
+        city="Berlin",
+        has_public_terrace=True,
+    )
+    flags = derive_flags(case)
+    assert flags.needs_public_terrace_permit is True
+
+
+def test_no_public_terrace_no_flag():
+    case = CaseProfile(
+        state=State.BERLIN,
+        city="Berlin",
+        has_public_terrace=False,
+    )
+    flags = derive_flags(case)
+    assert flags.needs_public_terrace_permit is False
 
 
 def test_no_food_employees_no_ifsg():
@@ -160,3 +206,23 @@ def test_sole_proprietor_no_commercial_register():
     )
     flags = derive_flags(case)
     assert flags.needs_commercial_register is False
+
+
+def test_has_employees_needs_social_insurance():
+    case = CaseProfile(
+        state=State.BERLIN,
+        city="Berlin",
+        has_employees=True,
+    )
+    flags = derive_flags(case)
+    assert flags.needs_social_insurance is True
+
+
+def test_no_employees_no_social_insurance():
+    case = CaseProfile(
+        state=State.BERLIN,
+        city="Berlin",
+        has_employees=False,
+    )
+    flags = derive_flags(case)
+    assert flags.needs_social_insurance is False
