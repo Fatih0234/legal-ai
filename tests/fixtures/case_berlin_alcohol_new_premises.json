@@ -1,0 +1,12 @@
+{
+  "state": "Berlin",
+  "city": "Berlin",
+  "address": "Kurfürstendamm 45",
+  "business_type": "cafe",
+  "serves_alcohol": true,
+  "has_seating": true,
+  "takeaway_only": false,
+  "existing_gastro_premises": false,
+  "employees_handle_food": true,
+  "legal_form": "UG"
+}

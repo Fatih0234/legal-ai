@@ -1,0 +1,31 @@
+[project]
+name = "legal-ai"
+version = "0.1.0"
+description = "Add your description here"
+requires-python = ">=3.13"
+dependencies = [
+    "anthropic>=0.86.0",
+    "beautifulsoup4>=4.14.3",
+    "fastapi>=0.135.2",
+    "httpx>=0.28.1",
+    "jinja2>=3.1.6",
+    "lxml>=6.0.2",
+    "pydantic>=2.12.5",
+    "pydantic-ai-slim[anthropic,web]>=1.70.0",
+    "pydantic-settings>=2.13.1",
+    "pytest>=9.0.2",
+    "rich>=14.3.3",
+    "typer>=0.24.1",
+    "uvicorn>=0.42.0",
+]
+
+[dependency-groups]
+dev = [
+    "pytest-asyncio>=1.3.0",
+]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+markers = [
+    "live: tests that make real HTTP calls to SDG portal",
+]

@@ -1,0 +1,12 @@
+{
+  "state": "Berlin",
+  "city": "Berlin",
+  "address": "Friedrichstraße 123",
+  "business_type": "cafe",
+  "serves_alcohol": false,
+  "has_seating": true,
+  "takeaway_only": false,
+  "existing_gastro_premises": false,
+  "employees_handle_food": true,
+  "legal_form": "sole proprietor"
+}

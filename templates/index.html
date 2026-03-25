@@ -1,0 +1,1022 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Germany Café Navigator</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:           #091710;
+  --surface:      #0E2118;
+  --surface-2:    #152C1E;
+  --border:       #1C3828;
+  --border-light: #274F38;
+  --text-primary: #EAE4CF;
+  --text-secondary: #7B9B82;
+  --text-muted:   #435C49;
+  --gold:         #C99428;
+  --amber:        #E8A83C;
+  --red:          #BF4F35;
+  --green:        #4DAA6C;
+  --blue:         #4A8FBF;
+  --font-serif:   'Cormorant Garamond', Georgia, serif;
+  --font-mono:    'IBM Plex Mono', 'Courier New', monospace;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: var(--font-mono);
+  background: var(--bg);
+  color: var(--text-primary);
+  min-height: 100vh;
+  line-height: 1.6;
+  font-size: 0.875rem;
+}
+
+/* ——— Header ——— */
+.page-header {
+  border-bottom: 1px solid var(--border);
+  padding: 40px 44px 30px;
+  position: relative;
+  overflow: hidden;
+}
+
+.page-header::before {
+  content: '';
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--gold) 0%, var(--amber) 55%, var(--red) 100%);
+}
+
+.header-inner { max-width: 1200px; margin: 0 auto; }
+
+.header-eyebrow {
+  font-size: 0.65rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 14px;
+}
+
+.header-title {
+  font-family: var(--font-serif);
+  font-weight: 700;
+  font-size: clamp(2.4rem, 4.5vw, 4.2rem);
+  line-height: 1.0;
+  letter-spacing: -0.01em;
+  color: var(--text-primary);
+}
+
+.header-title em {
+  font-style: italic;
+  color: var(--amber);
+}
+
+.header-subtitle {
+  margin-top: 14px;
+  font-size: 0.72rem;
+  color: var(--text-secondary);
+  letter-spacing: 0.08em;
+}
+
+.header-deco {
+  position: absolute;
+  right: 44px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-family: var(--font-serif);
+  font-size: 9rem;
+  font-style: italic;
+  color: var(--border);
+  pointer-events: none;
+  user-select: none;
+  line-height: 1;
+  font-weight: 700;
+}
+
+/* ——— Page Layout ——— */
+.main {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 40px 44px;
+  display: grid;
+  grid-template-columns: 360px 1fr;
+  gap: 44px;
+  align-items: start;
+}
+
+@media (max-width: 860px) {
+  .main { grid-template-columns: 1fr; padding: 24px 20px; gap: 32px; }
+  .header-deco { display: none; }
+  .page-header { padding: 32px 20px 24px; }
+}
+
+/* ——— Panel label ——— */
+.panel-label {
+  font-size: 0.6rem;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 18px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.panel-label::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+/* ——— Form Panel ——— */
+.form-panel { position: sticky; top: 40px; }
+
+#case-form {
+  background: var(--surface);
+  border: 1px solid var(--border);
+}
+
+.form-section {
+  padding: 18px 22px;
+  border-bottom: 1px solid var(--border);
+}
+.form-section:last-of-type { border-bottom: none; }
+
+.form-section-title {
+  font-size: 0.6rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 14px;
+}
+
+.field { margin-bottom: 14px; }
+.field:last-child { margin-bottom: 0; }
+
+.field label {
+  display: block;
+  font-size: 0.65rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+  margin-bottom: 5px;
+}
+
+.field input[type="text"],
+.field select {
+  width: 100%;
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid var(--border-light);
+  color: var(--text-primary);
+  font-family: var(--font-mono);
+  font-size: 0.875rem;
+  padding: 5px 0;
+  outline: none;
+  transition: border-color 0.2s;
+  appearance: none;
+  -webkit-appearance: none;
+  cursor: pointer;
+}
+.field input[type="text"]:focus,
+.field select:focus { border-bottom-color: var(--gold); }
+.field input[type="text"]::placeholder { color: var(--text-muted); }
+.field select option { background: var(--surface-2); color: var(--text-primary); }
+
+.select-wrap { position: relative; }
+.select-wrap::after {
+  content: '▾';
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-muted);
+  pointer-events: none;
+  font-size: 0.72rem;
+}
+
+.row { display: flex; gap: 16px; }
+.row .field { flex: 1; }
+
+/* Checkboxes */
+.cb-group { display: flex; flex-direction: column; gap: 10px; }
+
+.cb {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  cursor: pointer;
+}
+
+.cb input[type="checkbox"] {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 13px;
+  height: 13px;
+  border: 1px solid var(--border-light);
+  background: transparent;
+  cursor: pointer;
+  flex-shrink: 0;
+  margin-top: 2px;
+  transition: all 0.15s;
+  position: relative;
+}
+.cb input[type="checkbox"]:checked {
+  background: var(--gold);
+  border-color: var(--gold);
+}
+.cb input[type="checkbox"]:checked::after {
+  content: '✓';
+  position: absolute;
+  top: -2px;
+  left: 1px;
+  font-size: 0.68rem;
+  color: var(--bg);
+  font-weight: bold;
+}
+.cb label {
+  font-size: 0.78rem;
+  color: var(--text-primary);
+  cursor: pointer;
+  line-height: 1.4;
+}
+
+/* Submit */
+.form-submit { padding: 18px 22px; }
+
+button[type="submit"] {
+  width: 100%;
+  background: var(--gold);
+  color: var(--bg);
+  border: none;
+  padding: 11px 24px;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background 0.2s;
+}
+button[type="submit"]:hover:not(:disabled) { background: var(--amber); }
+button[type="submit"]:disabled { background: var(--text-muted); cursor: wait; }
+
+/* ——— Results Panel ——— */
+.results-panel { min-width: 0; }
+
+#results { display: none; }
+
+/* Sections */
+.section {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  margin-bottom: 14px;
+  animation: rise 0.35s ease both;
+}
+
+@keyframes rise {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.section:nth-child(1) { animation-delay: 0.04s; }
+.section:nth-child(2) { animation-delay: 0.08s; }
+.section:nth-child(3) { animation-delay: 0.12s; }
+.section:nth-child(4) { animation-delay: 0.16s; }
+.section:nth-child(5) { animation-delay: 0.20s; }
+.section:nth-child(6) { animation-delay: 0.24s; }
+.section:nth-child(7) { animation-delay: 0.28s; }
+
+.section-head {
+  padding: 11px 18px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.section-glyph {
+  font-size: 0.65rem;
+  color: var(--gold);
+  min-width: 14px;
+  text-align: center;
+}
+.section-title {
+  font-family: var(--font-serif);
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+.section-badge {
+  margin-left: auto;
+  font-size: 0.62rem;
+  color: var(--text-muted);
+  letter-spacing: 0.05em;
+}
+
+.section-body { padding: 14px 18px; }
+
+/* Summary */
+#summary-text {
+  font-family: var(--font-serif);
+  font-size: 1.0rem;
+  font-style: italic;
+  line-height: 1.75;
+  color: var(--text-primary);
+}
+
+/* Step rows */
+.step-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 9px 0;
+  border-bottom: 1px solid var(--border);
+}
+.step-row:last-child { border-bottom: none; padding-bottom: 0; }
+.step-row:first-child { padding-top: 0; }
+
+.step-text {
+  flex: 1;
+  font-size: 0.8rem;
+  line-height: 1.5;
+  color: var(--text-primary);
+}
+.step-text.done { text-decoration: line-through; color: var(--text-muted); }
+
+.step-status {
+  font-size: 0.6rem;
+  padding: 3px 7px;
+  border: 1px solid;
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+  font-family: var(--font-mono);
+  letter-spacing: 0.06em;
+  background: transparent;
+  outline: none;
+  flex-shrink: 0;
+}
+.step-status.PENDING { border-color: var(--border-light); color: var(--text-secondary); }
+.step-status.DONE    { border-color: var(--green);        color: var(--green);          background: rgba(77,170,108,0.08); }
+.step-status.BLOCKED { border-color: var(--red);          color: var(--red);            background: rgba(191,79,53,0.08); }
+.step-status option  { background: var(--surface-2); color: var(--text-primary); }
+
+/* Risk flags */
+.risk-item {
+  border-left: 2px solid;
+  padding: 10px 14px;
+  margin-bottom: 8px;
+  background: rgba(255,255,255,0.02);
+}
+.risk-item:last-child { margin-bottom: 0; }
+
+.risk-warning  { border-color: var(--amber); }
+.risk-info     { border-color: var(--blue);  }
+.risk-critical { border-color: var(--red);   }
+
+.risk-label {
+  font-size: 0.58rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  margin-bottom: 5px;
+}
+.risk-warning  .risk-label { color: var(--amber); }
+.risk-info     .risk-label { color: var(--blue);  }
+.risk-critical .risk-label { color: var(--red);   }
+
+.risk-item p  { font-size: 0.8rem; line-height: 1.55; }
+.risk-item em { color: var(--text-secondary); font-style: normal; }
+
+/* Lists */
+.section ul { list-style: none; padding: 0; }
+.section ul li {
+  padding: 7px 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 0.8rem;
+  line-height: 1.5;
+  display: flex;
+  gap: 10px;
+  align-items: baseline;
+}
+.section ul li:last-child { border-bottom: none; }
+.section ul li::before { content: '—'; color: var(--text-muted); flex-shrink: 0; }
+.section ul li a { color: var(--amber); text-decoration: none; word-break: break-all; font-size: 0.75rem; }
+.section ul li a:hover { text-decoration: underline; }
+
+/* Banners */
+.stale-banner {
+  background: rgba(200,148,40,0.08);
+  border: 1px solid rgba(200,148,40,0.25);
+  color: var(--amber);
+  padding: 9px 14px;
+  margin-bottom: 14px;
+  font-size: 0.76rem;
+  display: none;
+}
+.error {
+  background: rgba(191,79,53,0.1);
+  border: 1px solid rgba(191,79,53,0.3);
+  color: var(--red);
+  padding: 11px 14px;
+  margin-bottom: 14px;
+  font-size: 0.8rem;
+  display: none;
+}
+
+/* Chat */
+.chat-msgs {
+  max-height: 270px;
+  overflow-y: auto;
+  margin-bottom: 10px;
+  border: 1px solid var(--border);
+  padding: 12px;
+  min-height: 56px;
+  background: var(--bg);
+  scrollbar-width: thin;
+  scrollbar-color: var(--border) transparent;
+}
+.chat-placeholder {
+  color: var(--text-muted);
+  font-size: 0.76rem;
+  font-style: italic;
+  font-family: var(--font-serif);
+}
+.chat-row { display: flex; gap: 8px; }
+.chat-row input {
+  flex: 1;
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text-primary);
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  padding: 7px 11px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+.chat-row input:focus { border-color: var(--gold); }
+.chat-btn {
+  background: var(--surface-2);
+  color: var(--text-secondary);
+  border: 1px solid var(--border);
+  padding: 7px 13px;
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  letter-spacing: 0.1em;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+.chat-btn:hover:not(:disabled) { border-color: var(--gold); color: var(--gold); }
+.chat-btn.primary { background: var(--gold); color: var(--bg); border-color: var(--gold); }
+.chat-btn.primary:hover:not(:disabled) { background: var(--amber); border-color: var(--amber); }
+.chat-btn:disabled { opacity: 0.5; cursor: wait; }
+
+/* JSON toggle */
+.json-toggle {
+  cursor: pointer;
+  color: var(--text-muted);
+  font-size: 0.68rem;
+  letter-spacing: 0.1em;
+  padding: 10px 0;
+  display: block;
+  transition: color 0.2s;
+  user-select: none;
+}
+.json-toggle:hover { color: var(--gold); }
+.json-out {
+  display: none;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  padding: 14px;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  overflow-x: auto;
+  white-space: pre-wrap;
+  max-height: 400px;
+  overflow-y: auto;
+  color: var(--text-secondary);
+  margin-top: 4px;
+}
+
+/* Empty state */
+.empty-state {
+  text-align: center;
+  padding: 64px 40px;
+  color: var(--text-muted);
+  border: 1px solid var(--border);
+  background: var(--surface);
+}
+.empty-icon {
+  font-family: var(--font-serif);
+  font-size: 3.5rem;
+  font-style: italic;
+  font-weight: 700;
+  color: var(--border-light);
+  margin-bottom: 16px;
+  letter-spacing: -0.02em;
+}
+.empty-text {
+  font-size: 0.8rem;
+  line-height: 1.8;
+  color: var(--text-muted);
+}
+.empty-text strong { color: var(--text-secondary); }
+</style>
+</head>
+<body>
+
+<header class="page-header">
+  <div class="header-inner">
+    <p class="header-eyebrow">§ Regulatorischer Wegweiser · Bundesrepublik Deutschland</p>
+    <h1 class="header-title">Germany <em>Café</em><br>Navigator</h1>
+    <p class="header-subtitle">Permit checklist for opening a café or food business &nbsp;·&nbsp; Berlin &nbsp;·&nbsp; NRW &nbsp;·&nbsp; and beyond</p>
+  </div>
+  <div class="header-deco">Antrag</div>
+</header>
+
+<div class="main">
+
+  <!-- ——— Form Panel ——— -->
+  <div class="form-panel">
+    <p class="panel-label">Antrag / Application</p>
+
+    <div id="error" class="error"></div>
+
+    <form id="case-form">
+      <div class="form-section">
+        <p class="form-section-title">01 — Standort</p>
+        <div class="row">
+          <div class="field">
+            <label for="state">Bundesland</label>
+            <div class="select-wrap">
+              <select id="state" name="state">
+                <option value="Berlin">Berlin</option>
+                <option value="NRW">NRW</option>
+                <option value="Bayern">Bayern</option>
+                <option value="Hamburg">Hamburg</option>
+                <option value="Baden-Württemberg">Baden-Württemberg</option>
+                <option value="Hessen">Hessen</option>
+                <option value="Niedersachsen">Niedersachsen</option>
+                <option value="Sachsen">Sachsen</option>
+              </select>
+            </div>
+          </div>
+          <div class="field">
+            <label for="city">Stadt</label>
+            <input type="text" id="city" name="city" value="Berlin" required>
+          </div>
+        </div>
+        <div class="field">
+          <label for="address">Adresse</label>
+          <input type="text" id="address" name="address" placeholder="z.B. Friedrichstraße 123">
+        </div>
+      </div>
+
+      <div class="form-section">
+        <p class="form-section-title">02 — Rechtsform</p>
+        <div class="field">
+          <label for="legal_form">Unternehmensform</label>
+          <div class="select-wrap">
+            <select id="legal_form" name="legal_form">
+              <option value="sole proprietor">Einzelunternehmer</option>
+              <option value="UG">UG (haftungsbeschränkt)</option>
+              <option value="GmbH">GmbH</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-section">
+        <p class="form-section-title">03 — Betriebsmerkmale</p>
+        <div class="cb-group">
+          <label class="cb">
+            <input type="checkbox" id="serves_alcohol" name="serves_alcohol">
+            <span>Alkoholausschank (serves alcohol)</span>
+          </label>
+          <label class="cb">
+            <input type="checkbox" id="has_seating" name="has_seating" checked>
+            <span>Sitzbereich vorhanden (has seating)</span>
+          </label>
+          <label class="cb">
+            <input type="checkbox" id="takeaway_only" name="takeaway_only">
+            <span>Nur Außer-Haus (takeaway only)</span>
+          </label>
+          <label class="cb">
+            <input type="checkbox" id="existing_gastro_premises" name="existing_gastro_premises">
+            <span>Vorhandene Gastroräume (existing gastronomy)</span>
+          </label>
+          <label class="cb">
+            <input type="checkbox" id="employees_handle_food" name="employees_handle_food" checked>
+            <span>Mitarbeiter mit Lebensmittelkontakt (staff handle food)</span>
+          </label>
+        </div>
+      </div>
+
+      <div class="form-submit">
+        <button type="submit" id="submit-btn">Auswerten — Evaluate</button>
+      </div>
+    </form>
+  </div>
+
+  <!-- ——— Results Panel ——— -->
+  <div class="results-panel">
+    <p class="panel-label">Bescheid / Results</p>
+
+    <div id="results">
+      <div id="stale-banner" class="stale-banner"></div>
+
+      <div id="summary-section" class="section">
+        <div class="section-head">
+          <span class="section-glyph">§</span>
+          <span class="section-title">Zusammenfassung</span>
+        </div>
+        <div class="section-body">
+          <p id="summary-text"></p>
+        </div>
+      </div>
+
+      <div id="mustdo-section" class="section">
+        <div class="section-head">
+          <span class="section-glyph">►</span>
+          <span class="section-title">Pflichtmaßnahmen — Must Do Now</span>
+          <span class="section-badge" id="mustdo-count"></span>
+        </div>
+        <div class="section-body" id="mustdo-list"></div>
+      </div>
+
+      <div id="conditional-section" class="section" style="display:none">
+        <div class="section-head">
+          <span class="section-glyph">◈</span>
+          <span class="section-title">Bedingte Schritte — Conditional</span>
+          <span class="section-badge" id="conditional-count"></span>
+        </div>
+        <div class="section-body" id="conditional-list"></div>
+      </div>
+
+      <div id="risk-section" class="section" style="display:none">
+        <div class="section-head">
+          <span class="section-glyph">!</span>
+          <span class="section-title">Risikohinweise — Risk Flags</span>
+        </div>
+        <div class="section-body" id="risk-list"></div>
+      </div>
+
+      <div id="authorities-section" class="section" style="display:none">
+        <div class="section-head">
+          <span class="section-glyph">▣</span>
+          <span class="section-title">Zuständige Behörden — Authorities</span>
+        </div>
+        <div class="section-body"><ul id="authorities-list"></ul></div>
+      </div>
+
+      <div id="links-section" class="section">
+        <div class="section-head">
+          <span class="section-glyph">↗</span>
+          <span class="section-title">Offizielle Links</span>
+        </div>
+        <div class="section-body"><ul id="links-list"></ul></div>
+      </div>
+
+      <div id="questions-section" class="section">
+        <div class="section-head">
+          <span class="section-glyph">?</span>
+          <span class="section-title">Offene Fragen — Open Questions</span>
+        </div>
+        <div class="section-body"><ul id="questions-list"></ul></div>
+      </div>
+
+      <div id="chat-section" class="section">
+        <div class="section-head">
+          <span class="section-glyph">✉</span>
+          <span class="section-title">Rückfragen — Ask Follow-up</span>
+        </div>
+        <div class="section-body">
+          <div id="chat-messages" class="chat-msgs">
+            <p class="chat-placeholder">Ask a question about procedures, permits, or requirements.</p>
+          </div>
+          <div class="chat-row">
+            <input type="text" id="chat-input" placeholder="z.B. Was brauche ich für die Gaststättenerlaubnis?" onkeydown="if(event.key==='Enter')sendChat()">
+            <button class="chat-btn primary" onclick="sendChat()" id="chat-send">Senden</button>
+            <button class="chat-btn" onclick="newConversation()">Neu</button>
+          </div>
+        </div>
+      </div>
+
+      <span class="json-toggle" onclick="toggleJson()">▶ Show full JSON output</span>
+      <div id="json-output" class="json-out"></div>
+    </div>
+
+    <div id="empty-state" class="empty-state">
+      <div class="empty-icon">Café</div>
+      <p class="empty-text">
+        Complete the form and click <strong>Evaluate</strong><br>
+        to generate your personalised compliance checklist.
+      </p>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const STATE_CITIES = {
+  'Berlin': 'Berlin', 'NRW': 'Köln', 'Bayern': 'München',
+  'Hamburg': 'Hamburg', 'Baden-Württemberg': 'Stuttgart',
+  'Hessen': 'Frankfurt', 'Niedersachsen': 'Hannover', 'Sachsen': 'Dresden',
+};
+
+document.getElementById('state').addEventListener('change', function() {
+  document.getElementById('city').value = STATE_CITIES[this.value] || this.value;
+});
+
+let currentCaseId = null;
+let currentSessionId = null;
+
+document.getElementById('case-form').addEventListener('submit', async function(e) {
+  e.preventDefault();
+  const btn      = document.getElementById('submit-btn');
+  const errorDiv = document.getElementById('error');
+  const results  = document.getElementById('results');
+  const empty    = document.getElementById('empty-state');
+
+  btn.disabled = true;
+  btn.textContent = 'Analysiere...';
+  errorDiv.style.display = 'none';
+  results.style.display = 'none';
+
+  const payload = {
+    state:                   document.getElementById('state').value,
+    city:                    document.getElementById('city').value,
+    address:                 document.getElementById('address').value,
+    business_type:           'cafe',
+    serves_alcohol:          document.getElementById('serves_alcohol').checked,
+    has_seating:             document.getElementById('has_seating').checked,
+    takeaway_only:           document.getElementById('takeaway_only').checked,
+    existing_gastro_premises:document.getElementById('existing_gastro_premises').checked,
+    employees_handle_food:   document.getElementById('employees_handle_food').checked,
+    legal_form:              document.getElementById('legal_form').value,
+  };
+
+  try {
+    const resp = await fetch('/api/evaluate', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify(payload),
+    });
+    if (!resp.ok) { const err = await resp.json(); throw new Error(err.detail || resp.statusText); }
+    const data = await resp.json();
+    currentCaseId = data.case_id;
+    currentSessionId = null;
+    resetChatUI();
+    renderResults(data);
+    empty.style.display = 'none';
+    results.style.display = 'block';
+  } catch (err) {
+    errorDiv.textContent = 'Fehler: ' + err.message;
+    errorDiv.style.display = 'block';
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Auswerten — Evaluate';
+  }
+});
+
+function makeStepRow(text, status) {
+  const row  = document.createElement('div');
+  row.className = 'step-row';
+  row.dataset.stepText = text;
+
+  const span = document.createElement('span');
+  span.className = 'step-text';
+  span.textContent = text;
+
+  const sel = document.createElement('select');
+  sel.className = 'step-status ' + status;
+  ['PENDING','DONE','BLOCKED'].forEach(s => {
+    const opt = document.createElement('option');
+    opt.value = s; opt.textContent = s;
+    if (s === status) opt.selected = true;
+    sel.appendChild(opt);
+  });
+
+  sel.addEventListener('change', async function() {
+    const ns = this.value;
+    this.className = 'step-status ' + ns;
+    span.className = 'step-text' + (ns === 'DONE' ? ' done' : '');
+    if (!currentCaseId || !row.dataset.stepKey) return;
+    try {
+      await fetch('/api/cases/' + currentCaseId + '/steps/' + row.dataset.stepKey, {
+        method: 'PATCH',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({status: ns}),
+      });
+    } catch (e) { /* silent */ }
+  });
+
+  row.appendChild(span);
+  row.appendChild(sel);
+  return row;
+}
+
+function applyStepStatus(stepKey, status) {
+  document.querySelectorAll('.step-row[data-step-key="' + stepKey + '"]').forEach(row => {
+    const sel  = row.querySelector('.step-status');
+    const span = row.querySelector('.step-text');
+    if (sel)  { sel.value = status; sel.className = 'step-status ' + status; }
+    if (span) span.className = 'step-text' + (status === 'DONE' ? ' done' : '');
+  });
+}
+
+function wireStepKeys(steps) {
+  steps.forEach(s => {
+    document.querySelectorAll('.step-row').forEach(row => {
+      if (row.dataset.stepText === s.step_text) row.dataset.stepKey = s.step_key;
+    });
+  });
+}
+
+async function loadAndWireProgress() {
+  if (!currentCaseId) return;
+  try {
+    const resp  = await fetch('/api/cases/' + currentCaseId + '/progress');
+    const steps = await resp.json();
+    wireStepKeys(steps);
+    steps.forEach(s => applyStepStatus(s.step_key, s.status));
+  } catch (e) { /* silent */ }
+}
+
+function renderResults(data) {
+  // Stale banner
+  const staleBanner = document.getElementById('stale-banner');
+  if (data.stale_cache_warnings && data.stale_cache_warnings.length > 0) {
+    staleBanner.textContent = '⚠ Veraltete Daten (cached >90 days): ' + data.stale_cache_warnings.join(', ');
+    staleBanner.style.display = 'block';
+  } else {
+    staleBanner.style.display = 'none';
+  }
+
+  // Summary
+  document.getElementById('summary-text').textContent = data.summary || '';
+
+  // Must do
+  const mustdoList = document.getElementById('mustdo-list');
+  mustdoList.innerHTML = '';
+  const mustItems = data.must_do_now || [];
+  document.getElementById('mustdo-count').textContent = mustItems.length + ' items';
+  mustItems.forEach(item => mustdoList.appendChild(makeStepRow(item, 'PENDING')));
+
+  // Conditional
+  const condSection = document.getElementById('conditional-section');
+  const condList    = document.getElementById('conditional-list');
+  condList.innerHTML = '';
+  if (data.conditional_steps && data.conditional_steps.length > 0) {
+    condSection.style.display = 'block';
+    document.getElementById('conditional-count').textContent = data.conditional_steps.length + ' items';
+    data.conditional_steps.forEach(item => condList.appendChild(makeStepRow(item, 'PENDING')));
+  } else {
+    condSection.style.display = 'none';
+  }
+
+  // Risk flags
+  const riskSection = document.getElementById('risk-section');
+  const riskList    = document.getElementById('risk-list');
+  riskList.innerHTML = '';
+  if (data.risk_flags && data.risk_flags.length > 0) {
+    riskSection.style.display = 'block';
+    data.risk_flags.forEach(rf => {
+      const div = document.createElement('div');
+      div.className = 'risk-item risk-' + rf.severity;
+      div.innerHTML =
+        '<div class="risk-label">' + escapeHtml(rf.severity) + ' · ' + escapeHtml(rf.category) + '</div>' +
+        '<p>' + escapeHtml(rf.description) +
+        (rf.recommendation ? '<br><em>→ ' + escapeHtml(rf.recommendation) + '</em>' : '') + '</p>';
+      riskList.appendChild(div);
+    });
+  } else {
+    riskSection.style.display = 'none';
+  }
+
+  // Authorities
+  const authSection = document.getElementById('authorities-section');
+  const authList    = document.getElementById('authorities-list');
+  authList.innerHTML = '';
+  if (data.authorities && data.authorities.length > 0) {
+    authSection.style.display = 'block';
+    data.authorities.forEach(a => {
+      const li = document.createElement('li'); li.textContent = a; authList.appendChild(li);
+    });
+  } else {
+    authSection.style.display = 'none';
+  }
+
+  // Links
+  const linksList = document.getElementById('links-list');
+  linksList.innerHTML = '';
+  (data.official_links || []).forEach(link => {
+    const li = document.createElement('li');
+    const a  = document.createElement('a');
+    a.href = link; a.textContent = link; a.target = '_blank'; a.rel = 'noopener';
+    li.appendChild(a); linksList.appendChild(li);
+  });
+
+  // Questions
+  const qList = document.getElementById('questions-list');
+  qList.innerHTML = '';
+  (data.open_questions || []).forEach(q => {
+    const li = document.createElement('li'); li.textContent = q; qList.appendChild(li);
+  });
+
+  // JSON
+  document.getElementById('json-output').textContent = JSON.stringify(data, null, 2);
+
+  setTimeout(loadAndWireProgress, 100);
+}
+
+function toggleJson() {
+  const el     = document.getElementById('json-output');
+  const toggle = document.querySelector('.json-toggle');
+  const open   = el.style.display === 'block';
+  el.style.display  = open ? 'none' : 'block';
+  toggle.textContent = (open ? '▶' : '▼') + ' Show full JSON output'.replace('Show', open ? 'Show' : 'Hide');
+}
+
+function resetChatUI() {
+  document.getElementById('chat-messages').innerHTML =
+    '<p class="chat-placeholder">Ask a question about procedures, permits, or requirements.</p>';
+}
+
+function newConversation() {
+  if (currentSessionId) fetch('/api/chat/' + currentSessionId, {method: 'DELETE'}).catch(() => {});
+  currentSessionId = null;
+  resetChatUI();
+}
+
+async function sendChat() {
+  const input    = document.getElementById('chat-input');
+  const sendBtn  = document.getElementById('chat-send');
+  const msgs     = document.getElementById('chat-messages');
+  const msg      = input.value.trim();
+  if (!msg) return;
+
+  const placeholder = msgs.querySelector('.chat-placeholder');
+  if (placeholder) placeholder.remove();
+
+  const userDiv = document.createElement('div');
+  userDiv.style.cssText = 'margin-bottom:10px;text-align:right';
+  userDiv.innerHTML = '<span style="background:var(--gold);color:var(--bg);padding:6px 10px;display:inline-block;max-width:82%;text-align:left;font-size:0.76rem">' + escapeHtml(msg) + '</span>';
+  msgs.appendChild(userDiv);
+
+  input.value = '';
+  sendBtn.disabled = true;
+  sendBtn.textContent = '...';
+
+  const loading = document.createElement('div');
+  loading.id = 'chat-loading';
+  loading.style.marginBottom = '10px';
+  loading.innerHTML = '<span style="background:var(--surface-2);border:1px solid var(--border);color:var(--text-muted);padding:6px 10px;display:inline-block;font-size:0.76rem">Analysiere…</span>';
+  msgs.appendChild(loading);
+  msgs.scrollTop = msgs.scrollHeight;
+
+  try {
+    const resp = await fetch('/api/chat', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({message: msg, session_id: currentSessionId || ''}),
+    });
+    const data = await resp.json();
+    loading.remove();
+
+    if (resp.ok) {
+      currentSessionId = data.session_id;
+      const botDiv = document.createElement('div');
+      botDiv.style.marginBottom = '10px';
+      botDiv.innerHTML = '<span style="background:var(--surface-2);border:1px solid var(--border);color:var(--text-primary);padding:6px 10px;display:inline-block;max-width:85%;font-size:0.76rem;white-space:pre-wrap">' + escapeHtml(data.response) + '</span>';
+      msgs.appendChild(botDiv);
+    } else {
+      const errDiv = document.createElement('div');
+      errDiv.style.cssText = 'margin-bottom:8px;color:var(--red);font-size:0.76rem';
+      errDiv.textContent = 'Fehler: ' + (data.detail || 'Something went wrong');
+      msgs.appendChild(errDiv);
+    }
+  } catch (err) {
+    loading.remove();
+    const errDiv = document.createElement('div');
+    errDiv.style.cssText = 'margin-bottom:8px;color:var(--red);font-size:0.76rem';
+    errDiv.textContent = 'Fehler: ' + err.message;
+    msgs.appendChild(errDiv);
+  } finally {
+    sendBtn.disabled = false;
+    sendBtn.textContent = 'Senden';
+    msgs.scrollTop = msgs.scrollHeight;
+    input.focus();
+  }
+}
+
+function escapeHtml(text) {
+  const div = document.createElement('div');
+  div.textContent = text;
+  return div.innerHTML;
+}
+</script>
+</body>
+</html>

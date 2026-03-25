@@ -1,0 +1,12 @@
+{
+  "state": "Berlin",
+  "city": "Berlin",
+  "address": "Torstraße 89",
+  "business_type": "cafe",
+  "serves_alcohol": false,
+  "has_seating": true,
+  "takeaway_only": false,
+  "existing_gastro_premises": true,
+  "employees_handle_food": false,
+  "legal_form": "sole proprietor"
+}
