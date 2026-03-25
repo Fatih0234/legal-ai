@@ -113,8 +113,7 @@ def web(
     import uvicorn
 
     console.print(f"[green]Starting web server at http://{host}:{port}[/green]")
-    console.print(f"[dim]Form: http://{host}:{port}/[/dim]")
-    console.print(f"[dim]Chat: http://{host}:{port}/chat[/dim]")
+    console.print(f"[dim]Open: http://{host}:{port}/[/dim]")
     uvicorn.run("app.web:app", host=host, port=port)
 
 
